@@ -1,0 +1,6 @@
+module Pods_GameSearcher {
+  umbrella header "Pods-GameSearcher-umbrella.h"
+
+  export *
+  module * { export * }
+}
