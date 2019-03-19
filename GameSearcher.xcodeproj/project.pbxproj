@@ -21,6 +21,7 @@
 		9C553F542240199B00A31A34 /* Consts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C553F532240199B00A31A34 /* Consts.swift */; };
 		9CBBB108224042F100E12A55 /* GameCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB107224042F100E12A55 /* GameCellView.swift */; };
 		9CBBB10A2240753200E12A55 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB1092240753200E12A55 /* Extensions.swift */; };
+		9CBBB10C22408BA200E12A55 /* gamesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB10B22408BA200E12A55 /* gamesViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		9C553F532240199B00A31A34 /* Consts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Consts.swift; sourceTree = "<group>"; };
 		9CBBB107224042F100E12A55 /* GameCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCellView.swift; sourceTree = "<group>"; };
 		9CBBB1092240753200E12A55 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		9CBBB10B22408BA200E12A55 /* gamesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gamesViewModel.swift; sourceTree = "<group>"; };
 		A53D8996F3D7A26E223DECF0 /* libPods-GameSearcher.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GameSearcher.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDC908ADDC61443DB763F295 /* Pods-GameSearcher.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GameSearcher.debug.xcconfig"; path = "Target Support Files/Pods-GameSearcher/Pods-GameSearcher.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -144,6 +146,7 @@
 				9C553F272240124600A31A34 /* LaunchScreen.storyboard */,
 				9C553F2A2240124600A31A34 /* Info.plist */,
 				9CBBB1092240753200E12A55 /* Extensions.swift */,
+				9CBBB10B22408BA200E12A55 /* gamesViewModel.swift */,
 			);
 			path = GameSearcher;
 			sourceTree = "<group>";
@@ -336,6 +339,7 @@
 				9C553F542240199B00A31A34 /* Consts.swift in Sources */,
 				9C553F50224015CF00A31A34 /* GameSearchResultsModel.swift in Sources */,
 				9CBBB10A2240753200E12A55 /* Extensions.swift in Sources */,
+				9CBBB10C22408BA200E12A55 /* gamesViewModel.swift in Sources */,
 				9CBBB108224042F100E12A55 /* GameCellView.swift in Sources */,
 				9C553F212240124500A31A34 /* ViewController.swift in Sources */,
 				9C553F1F2240124500A31A34 /* AppDelegate.swift in Sources */,

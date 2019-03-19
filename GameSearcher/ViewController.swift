@@ -13,9 +13,8 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var gamesTableView: UITableView!
-    fileprivate var searchResult : GameSearchResultsModel?
     fileprivate var giantBombAPI: GameSearchAPI?
-    fileprivate var isfetching: Bool?
+    fileprivate var gamesViewModel =  GamesViewModel()
     
     @IBAction func searchButtonPressed(_ sender: Any) {
         callSearchAPI()
@@ -25,11 +24,10 @@ class ViewController: UIViewController {
     }
     
     func callSearchAPI() {
-        self.searchResult?.results.removeAll()
-        self.searchResult?.offset = 0
+        self.gamesViewModel.gamesList.removeAll()
+        self.gamesViewModel.offset = 0
         fetchPage(page: 1)
     }
-    
     
     func fetchPage(page: Int) {
         giantBombAPI = GameSearchAPI.init(searchHandler: { (response, result) in
@@ -38,13 +36,14 @@ class ViewController: UIViewController {
                     DispatchQueue.main.async {
                         print(error)
                         //check if we are adding more games to the list or new search
-                        if self.searchResult?.results != nil, (self.searchResult?.results.count)! > 0 {
+                        if self.gamesViewModel.gamesList.count > 0 {
                             for game in (result?.results)! {
-                                self.searchResult?.results.append(game)
+                                self.gamesViewModel.gamesList.append(game)
                             }
-                            self.searchResult?.offset = (result?.offset)!
+                            self.gamesViewModel.offset = (result?.offset)!
                         } else {
-                            self.searchResult = result!
+                            self.gamesViewModel.gamesList = (result?.results)!
+                            self.gamesViewModel.totalResults = (result?.number_of_total_results)!
                         }
                         // check if any games exist
                         if result!.number_of_page_results == 0 {
@@ -54,7 +53,7 @@ class ViewController: UIViewController {
                         } else {
                             self.gamesTableView.reloadData()
                         }
-                        self.isfetching = false
+                        self.gamesViewModel.isFetching = false
                     }
                 }
             } else if response == RequestResult.Failure {
@@ -69,7 +68,7 @@ class ViewController: UIViewController {
 
 extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchResult?.results.count ?? 0
+        return gamesViewModel.gamesList.count
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -79,10 +78,10 @@ extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PlainCell", for: indexPath) as! GameCellView
         //Title
-        cell.gameTitleView.text = searchResult?.results[indexPath.row].name
+        cell.gameTitleView.text = gamesViewModel.gamesList[indexPath.row].name
         
         //Release Date
-        let usableDate = searchResult?.results[indexPath.row].original_release_date
+        let usableDate = gamesViewModel.gamesList[indexPath.row].original_release_date
         var releaseDate = "N/A"
         if usableDate != nil {
             releaseDate = String(usableDate![..<String.Index(encodedOffset: 10)])
@@ -90,7 +89,7 @@ extension ViewController : UITableViewDataSource {
         cell.releaseDateView.text = "Release Date: \(releaseDate)"
 
         //Thumbnail image async
-        let imageUrl = searchResult?.results[indexPath.row].image["tiny_url"]
+        let imageUrl = gamesViewModel.gamesList[indexPath.row].image["tiny_url"]
         Alamofire.request(imageUrl!, method: .get).responseData { response in
             DispatchQueue.main.async {
                 guard let image = UIImage(data:response.data!) else {
@@ -99,24 +98,18 @@ extension ViewController : UITableViewDataSource {
                 cell.thumbnailView?.image = image
             }
         }
-        
         return cell
     }
-    
 }
 
 extension ViewController : UITableViewDelegate {
-    
     //pagination
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.extractCurrentY() > scrollView.contentSize.height - 100.0 {
-            if (searchResult?.results.count)! < (searchResult?.number_of_total_results)! && !isfetching! {
-                isfetching = true
-                let nextPage = ((searchResult?.offset)! + 20) / 10 //should be refactored
-                fetchPage(page: nextPage )
+            if gamesViewModel.gamesList.count < gamesViewModel.totalResults && !gamesViewModel.isFetching {
+                gamesViewModel.isFetching = true
+                fetchPage(page: (gamesViewModel.getPage()) )
             }
         }
-        
     }
-    
 }
