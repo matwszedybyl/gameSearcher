@@ -11,30 +11,42 @@ import Alamofire
 
 class ViewController: UIViewController {
 
-    var searchAPI: GameSearchAPI?
-    
     @IBOutlet weak var searchTextField: UITextField!
-    
     @IBOutlet weak var gamesTableView: UITableView!
-    
     fileprivate var searchResult : GameSearchResultsModel?
+    fileprivate var giantBombAPI: GameSearchAPI?
+    fileprivate var isfetching: Bool?
     
     @IBAction func searchButtonPressed(_ sender: Any) {
         callSearchAPI()
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    func callSearchAPI() {
+        self.searchResult?.results.removeAll()
+        self.searchResult?.offset = 0
+        fetchPage(page: 1)
     }
     
     
-    func callSearchAPI() {
-        searchAPI = GameSearchAPI.init(searchHandler: { (response, result) in
+    func fetchPage(page: Int) {
+        giantBombAPI = GameSearchAPI.init(searchHandler: { (response, result) in
             if response == RequestResult.Success {
                 if let error = result?.error {
                     DispatchQueue.main.async {
                         print(error)
-                        self.searchResult = result!
+                        //check if we are adding more games to the list or new search
+                        if self.searchResult?.results != nil, (self.searchResult?.results.count)! > 0 {
+                            for game in (result?.results)! {
+                                self.searchResult?.results.append(game)
+                            }
+                            self.searchResult?.offset = (result?.offset)!
+                        } else {
+                            self.searchResult = result!
+                        }
+                        // check if any games exist
                         if result!.number_of_page_results == 0 {
                             let alert = UIAlertController(title: "Error", message: "No games found", preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -42,16 +54,18 @@ class ViewController: UIViewController {
                         } else {
                             self.gamesTableView.reloadData()
                         }
+                        self.isfetching = false
                     }
                 }
             } else if response == RequestResult.Failure {
                 print("Error")
             }
         })
-        searchAPI?.callGameSearchAPI(gameName: searchTextField.text!)
+        let query = searchTextField.text?.replacingOccurrences(of: " ", with: "+")
+        giantBombAPI?.callGameSearchAPI(gameName: query!, page: page)
     }
+    
 }
-
 
 extension ViewController : UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -62,25 +76,47 @@ extension ViewController : UITableViewDataSource {
         return 1
     }
 
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PlainCell", for: indexPath) as! GameCellView
+        //Title
         cell.gameTitleView.text = searchResult?.results[indexPath.row].name
         
+        //Release Date
+        let usableDate = searchResult?.results[indexPath.row].original_release_date
+        var releaseDate = "N/A"
+        if usableDate != nil {
+            releaseDate = String(usableDate![..<String.Index(encodedOffset: 10)])
+        }
+        cell.releaseDateView.text = "Release Date: \(releaseDate)"
+
+        //Thumbnail image async
         let imageUrl = searchResult?.results[indexPath.row].image["tiny_url"]
         Alamofire.request(imageUrl!, method: .get).responseData { response in
             DispatchQueue.main.async {
                 guard let image = UIImage(data:response.data!) else {
-                    // Handle error
                     return
                 }
                 cell.thumbnailView?.image = image
             }
         }
+        
         return cell
     }
     
 }
 
 extension ViewController : UITableViewDelegate {
+    
+    //pagination
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.extractCurrentY() > scrollView.contentSize.height - 100.0 {
+            if (searchResult?.results.count)! < (searchResult?.number_of_total_results)! && !isfetching! {
+                isfetching = true
+                let nextPage = ((searchResult?.offset)! + 20) / 10 //should be refactored
+                fetchPage(page: nextPage )
+            }
+        }
+        
+    }
+    
 }

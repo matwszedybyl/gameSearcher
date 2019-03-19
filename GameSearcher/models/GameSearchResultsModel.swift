@@ -16,7 +16,6 @@ struct GameSearchResultsModel: Codable {
     var number_of_total_results: Int
     var status_code: Int
     var results: [GameModel]
-//    var version: String
 //    
     
 }

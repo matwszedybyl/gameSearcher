@@ -18,9 +18,11 @@ class GameSearchAPI {
         searchCompletion = searchHandler
     }
     
+    
+    
 
-    func callGameSearchAPI(gameName : String) {
-        let gameSearchURL = URL(string: "http://www.giantbomb.com/api/search/?api_key=" + API_KEY + "&format=json&query=\(gameName)&resources=game")
+    func callGameSearchAPI(gameName : String, page : Int) {
+        let gameSearchURL = URL(string: "http://www.giantbomb.com/api/search/?api_key=" + API_KEY + "&format=json&query=\(gameName)&resources=game&page=\(page)")
 
         let task = URLSession.shared.dataTask(with: gameSearchURL!){ (data, respond, error) in
             guard let dataResponse = data,
@@ -37,6 +39,8 @@ class GameSearchAPI {
         }
         task.resume()
     }
+    
+
     
     
 }

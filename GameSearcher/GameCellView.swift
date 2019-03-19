@@ -13,5 +13,7 @@ class GameCellView : UITableViewCell {
     
     @IBOutlet weak var thumbnailView: UIImageView!
     
+    @IBOutlet weak var releaseDateView: UITextView!
+    
     @IBOutlet weak var gameTitleView: UITextView!
 }
